@@ -1,0 +1,20 @@
+/* src/components/common/ConfirmationDialog.css */
+.confirmation-dialog p {
+    margin-bottom: 20px;
+  }
+  
+  .confirmation-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  
+  .confirm-btn {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  .cancel-btn {
+    background-color: #f44336;
+    color: white;
+  }

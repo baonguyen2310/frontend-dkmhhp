@@ -1,0 +1,33 @@
+/* frontend-dkmhhp/src/pages/Dashboard/Dashboard.css */
+
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+  }
+  
+  .dashboard-sidebar {
+    width: 200px;
+    background-color: #f4f4f4;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+  }
+  
+  .dashboard-sidebar ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .dashboard-sidebar li {
+    margin: 10px 0;
+    cursor: pointer;
+    color: #333;
+  }
+  
+  .dashboard-sidebar li:hover {
+    color: #007bff;
+  }
+  
+  .dashboard-content {
+    flex: 1;
+    padding: 20px;
+  }

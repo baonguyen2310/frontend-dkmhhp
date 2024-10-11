@@ -1,0 +1,38 @@
+/* frontend-dkmhhp/src/components/DebtList/DebtList.css */
+
+.debt-list-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+  }
+  
+  .debt-list-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .debt-list-container .error-message {
+    color: red;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  
+  .debt-list {
+    margin-top: 20px;
+  }
+  
+  .debt-item {
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+  }
+  
+  .debt-item h3 {
+    margin: 0;
+  }
+  
+  .debt-item p {
+    margin: 5px 0;
+  }
