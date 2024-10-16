@@ -5,9 +5,10 @@ import './Dashboard.css';
 import StudentManagement from '../../components/StudentManagement';
 import CourseManagement from '../../components/CourseManagement';
 import CourseRegistrationManagement from '../../components/CourseRegistrationManagement';
-import FeeManagement from '../../components/FeeManagement';
+import FeeManagement from '../../components/FeeManagement/FeeManagement';
 import UnpaidStudentsReport from '../../components/UnpaidStudentsReport';
-import Layout from '../../components/Layout';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser, faBook, faClipboardList, faMoneyBill, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 
 const Dashboard = () => {
   const [activeSection, setActiveSection] = useState('StudentManagement');
@@ -29,21 +30,34 @@ const Dashboard = () => {
     }
   };
 
+  const menuItems = [
+    { id: 'StudentManagement', icon: faUser, label: 'Student Management' },
+    { id: 'CourseManagement', icon: faBook, label: 'Course Management' },
+    { id: 'CourseRegistrationManagement', icon: faClipboardList, label: 'Course Registration' },
+    { id: 'FeeManagement', icon: faMoneyBill, label: 'Fee Management' },
+    { id: 'UnpaidStudentsReport', icon: faExclamationTriangle, label: 'Unpaid Students' },
+  ];
+
   return (
-      <div className="dashboard-container">
-        <aside className="dashboard-sidebar">
-          <ul>
-            <li onClick={() => setActiveSection('StudentManagement')}>Student Management</li>
-            <li onClick={() => setActiveSection('CourseManagement')}>Course Management</li>
-            <li onClick={() => setActiveSection('CourseRegistrationManagement')}>Course Registration Management</li>
-            <li onClick={() => setActiveSection('FeeManagement')}>Fee Management</li>
-            <li onClick={() => setActiveSection('UnpaidStudentsReport')}>Unpaid Students Report</li>
-          </ul>
-        </aside>
-        <section className="dashboard-content">
-          {renderSection()}
-        </section>
-      </div>
+    <div className="dashboard-container">
+      <aside className="dashboard-sidebar">
+        <ul>
+          {menuItems.map((item) => (
+            <li
+              key={item.id}
+              onClick={() => setActiveSection(item.id)}
+              className={activeSection === item.id ? 'active' : ''}
+            >
+              <FontAwesomeIcon icon={item.icon} />
+              <span>{item.label}</span>
+            </li>
+          ))}
+        </ul>
+      </aside>
+      <main className="dashboard-content">
+        {renderSection()}
+      </main>
+    </div>
   );
 };
 
