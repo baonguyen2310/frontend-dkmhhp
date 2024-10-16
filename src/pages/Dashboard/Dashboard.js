@@ -4,11 +4,9 @@ import React, { useState } from 'react';
 import './Dashboard.css';
 import StudentManagement from '../../components/StudentManagement';
 import CourseManagement from '../../components/CourseManagement';
-import CourseRegistration from '../../components/CourseRegistration';
-import TuitionCalculation from '../../components/TuitionCalculation';
-import TuitionPayment from '../../components/TuitionPayment';
-import TuitionSummary from '../../components/TuitionSummary';
-import DebtList from '../../components/DebtList';
+import CourseRegistrationManagement from '../../components/CourseRegistrationManagement';
+import FeeManagement from '../../components/FeeManagement';
+import UnpaidStudentsReport from '../../components/UnpaidStudentsReport';
 import Layout from '../../components/Layout';
 
 const Dashboard = () => {
@@ -20,16 +18,12 @@ const Dashboard = () => {
         return <StudentManagement />;
       case 'CourseManagement':
         return <CourseManagement />;
-      case 'CourseRegistration':
-        return <CourseRegistration />;
-      case 'TuitionCalculation':
-        return <TuitionCalculation />;
-      case 'TuitionPayment':
-        return <TuitionPayment />;
-      case 'TuitionSummary':
-        return <TuitionSummary />;
-      case 'DebtList':
-        return <DebtList />;
+      case 'CourseRegistrationManagement':
+        return <CourseRegistrationManagement />;
+      case 'FeeManagement':
+        return <FeeManagement />;
+      case 'UnpaidStudentsReport':
+        return <UnpaidStudentsReport />;
       default:
         return <StudentManagement />;
     }
@@ -41,11 +35,9 @@ const Dashboard = () => {
           <ul>
             <li onClick={() => setActiveSection('StudentManagement')}>Student Management</li>
             <li onClick={() => setActiveSection('CourseManagement')}>Course Management</li>
-            <li onClick={() => setActiveSection('CourseRegistration')}>Course Registration</li>
-            <li onClick={() => setActiveSection('TuitionCalculation')}>Tuition Calculation</li>
-            <li onClick={() => setActiveSection('TuitionPayment')}>Tuition Payment</li>
-            <li onClick={() => setActiveSection('TuitionSummary')}>Tuition Summary</li>
-            <li onClick={() => setActiveSection('DebtList')}>Debt List</li>
+            <li onClick={() => setActiveSection('CourseRegistrationManagement')}>Course Registration Management</li>
+            <li onClick={() => setActiveSection('FeeManagement')}>Fee Management</li>
+            <li onClick={() => setActiveSection('UnpaidStudentsReport')}>Unpaid Students Report</li>
           </ul>
         </aside>
         <section className="dashboard-content">

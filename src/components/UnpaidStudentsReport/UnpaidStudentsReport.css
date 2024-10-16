@@ -1,0 +1,80 @@
+.unpaid-students-report {
+  padding: 20px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.unpaid-students-report h2 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.controls select {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.controls button {
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.controls button:hover {
+  background-color: #0056b3;
+}
+
+.unpaid-students-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.unpaid-students-table th,
+.unpaid-students-table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+}
+
+.unpaid-students-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+.unpaid-students-table tr:nth-child(even) {
+  background-color: #f8f8f8;
+}
+
+.unpaid-students-table tr:hover {
+  background-color: #e8e8e8;
+}
+
+@media (max-width: 768px) {
+  .controls {
+    flex-direction: column;
+  }
+
+  .unpaid-students-table {
+    font-size: 14px;
+  }
+
+  .unpaid-students-table th,
+  .unpaid-students-table td {
+    padding: 8px;
+  }
+}

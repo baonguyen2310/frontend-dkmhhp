@@ -1,11 +1,11 @@
-.course-management-container {
+.fee-management-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
   font-family: Arial, sans-serif;
 }
 
-.course-management-content {
+.fee-management-content {
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -25,4 +25,3 @@
 }
 
 /* Các styles khác có thể được giữ nguyên hoặc điều chỉnh tùy theo nhu cầu */
-
