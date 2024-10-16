@@ -1,6 +1,6 @@
 // frontend-dkmhhp/src/components/common/Table/Table.js
 import React from 'react';
-import Button from '../Button';
+import Button from '../Button/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import './Table.css';
@@ -27,18 +27,22 @@ const Table = ({ columns, data, onEdit, onDelete }) => {
               ))}
               <td>
                 <div className="action-buttons">
-                  <Button
-                    className="edit-btn"
-                    onClick={() => onEdit(item)}
-                  >
-                    <FontAwesomeIcon icon={faEdit} />
-                  </Button>
-                  <Button
-                    className="delete-btn"
-                    onClick={() => onDelete(item.id || item.student_id)}
-                  >
-                    <FontAwesomeIcon icon={faTrash} />
-                  </Button>
+                  {onEdit && (
+                    <Button
+                      className="edit-btn"
+                      onClick={() => onEdit(item)}
+                    >
+                      <FontAwesomeIcon icon={faEdit} />
+                    </Button>
+                  )}
+                  {onDelete && (
+                    <Button
+                      className="delete-btn"
+                      onClick={() => onDelete(item.id || item.student_id)}
+                    >
+                      <FontAwesomeIcon icon={faTrash} />
+                    </Button>
+                  )}
                 </div>
               </td>
             </tr>
