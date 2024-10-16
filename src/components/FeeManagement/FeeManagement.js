@@ -66,7 +66,9 @@ const FeeManagement = () => {
   const openModal = (fee = null) => {
     if (fee) {
       setSelectedFee({
-        ...fee
+        ...fee,
+        payment_deadline: fee.payment_deadline.split('T')[0],
+        early_payment_deadline: fee.early_payment_deadline.split('T')[0]
       });
       setIsEditing(true);
     } else {
@@ -208,6 +210,22 @@ const FeeManagement = () => {
         onChange={handleChange}
         required
       />
+      <FormInput
+        type="date"
+        name="payment_deadline"
+        placeholder="Payment Deadline"
+        value={selectedFee.payment_deadline}
+        onChange={handleChange}
+        required
+      />
+      <FormInput
+        type="date"
+        name="early_payment_deadline"
+        placeholder="Early Payment Deadline"
+        value={selectedFee.early_payment_deadline}
+        onChange={handleChange}
+        required
+      />
       <div className="form-actions">
         <Button type="submit" className="submit-btn">
           {isEditing ? 'Update Fee' : 'Add Fee'}
@@ -225,7 +243,9 @@ const FeeManagement = () => {
     { key: 'semester_id', title: 'Semester ID' },
     { key: 'tuition_fee', title: 'Tuition Fee', render: (fee) => `$${fee.tuition_fee.toFixed(2)}` },
     { key: 'amount_paid', title: 'Amount Paid', render: (fee) => `$${fee.amount_paid.toFixed(2)}` },
-    { key: 'payment_status', title: 'Payment Status' }
+    { key: 'payment_status', title: 'Payment Status' },
+    { key: 'payment_deadline', title: 'Payment Deadline', render: (fee) => new Date(fee.payment_deadline).toLocaleDateString() },
+    { key: 'early_payment_deadline', title: 'Early Payment Deadline', render: (fee) => new Date(fee.early_payment_deadline).toLocaleDateString() },
   ];
 
   const renderPaymentForm = () => (
