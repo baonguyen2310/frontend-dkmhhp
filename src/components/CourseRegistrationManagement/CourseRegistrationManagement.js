@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import DataManagement from '../common/DataManagement/DataManagement';
 import {
   fetchCourseRegistrations,
   addCourseRegistration,
   updateCourseRegistration,
-  deleteCourseRegistration
+  deleteCourseRegistration,
+  fetchStudents,
+  fetchCourses
 } from '../../services/api';
 import FormInput from '../common/FormInput';
 import Button from '../common/Button';
@@ -13,37 +15,81 @@ const initialRegistrationState = {
   student_id: '',
   course_id: '',
   semester_id: '',
-  registration_date: ''
+  registration_date: new Date().toISOString().split('T')[0],
+  registration_status: 'Pending'
+};
+
+const handleError = (error) => {
+  if (error.response && error.response.data) {
+    const errorMessage = error.response.data.message || 'An error occurred';
+    console.error(errorMessage);
+  } else {
+    console.error('An unexpected error occurred');
+  }
 };
 
 const CourseRegistrationManagement = () => {
+  const [students, setStudents] = useState([]);
+  const [courses, setCourses] = useState([]);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [fetchedStudents, fetchedCourses] = await Promise.all([
+          fetchStudents(),
+          fetchCourses()
+        ]);
+        setStudents(fetchedStudents);
+        setCourses(fetchedCourses);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        handleError(error);
+      }
+    };
+    loadData();
+  }, []);
+
   const columns = [
-    { key: 'registration_id', title: 'ID' },
-    { key: 'student_id', title: 'Student ID' },
-    { key: 'first_name', title: 'First Name' },
-    { key: 'last_name', title: 'Last Name' },
-    { key: 'course_id', title: 'Course ID' },
-    { key: 'course_name', title: 'Course Name' },
+    { key: 'registration_id', title: 'Registration ID' },
+    { 
+      key: 'student_id', 
+      title: 'Student', 
+      render: (registration) => {
+        const student = students.find(s => s.student_id === registration.student_id);
+        return student ? `${student.first_name} ${student.last_name}` : registration.student_id;
+      }
+    },
+    { 
+      key: 'course_id', 
+      title: 'Course', 
+      render: (registration) => {
+        const course = courses.find(c => c.course_id === registration.course_id);
+        return course ? course.course_name : registration.course_id;
+      }
+    },
     { key: 'semester_id', title: 'Semester ID' },
-    { key: 'registration_date', title: 'Date', render: (registration) => new Date(registration.registration_date).toLocaleDateString() },
+    { key: 'registration_date', title: 'Registration Date', render: (registration) => new Date(registration.registration_date).toLocaleDateString() },
+    { key: 'registration_status', title: 'Status' }
   ];
 
   const renderForm = ({ handleSubmit, handleChange, selectedItem, isEditing, closeModal }) => (
     <form onSubmit={handleSubmit}>
       <FormInput
-        type="text"
+        type="select"
         name="student_id"
-        placeholder="Student ID"
+        placeholder="Student"
         value={selectedItem.student_id}
         onChange={handleChange}
+        options={students.map(s => ({ value: s.student_id, label: `${s.first_name} ${s.last_name}` }))}
         required
       />
       <FormInput
-        type="text"
+        type="select"
         name="course_id"
-        placeholder="Course ID"
+        placeholder="Course"
         value={selectedItem.course_id}
         onChange={handleChange}
+        options={courses.map(c => ({ value: c.course_id, label: c.course_name }))}
         required
       />
       <FormInput
@@ -62,6 +108,19 @@ const CourseRegistrationManagement = () => {
         onChange={handleChange}
         required
       />
+      <FormInput
+        type="select"
+        name="registration_status"
+        placeholder="Status"
+        value={selectedItem.registration_status}
+        onChange={handleChange}
+        options={[
+          { value: 'Pending', label: 'Pending' },
+          { value: 'Confirmed', label: 'Confirmed' },
+          { value: 'Cancelled', label: 'Cancelled' }
+        ]}
+        required
+      />
       <div className="form-actions">
         <Button type="submit" className="submit-btn">
           {isEditing ? 'Update Registration' : 'Add Registration'}
@@ -73,23 +132,6 @@ const CourseRegistrationManagement = () => {
     </form>
   );
 
-  const handleUpdateRegistration = async (registrationId, newStatus) => {
-    try {
-      const response = await updateCourseRegistration(registrationId, { registration_status: newStatus });
-      return {
-        success: true,
-        message: response.data.message,
-        feeDetails: response.data.feeDetails
-      };
-    } catch (error) {
-      console.error('Error updating registration:', error);
-      return {
-        success: false,
-        message: error.response?.data?.message || 'Failed to update registration.'
-      };
-    }
-  };
-
   return (
     <DataManagement
       title="Course Registration"
@@ -100,7 +142,8 @@ const CourseRegistrationManagement = () => {
       initialDataState={initialRegistrationState}
       columns={columns}
       renderForm={renderForm}
-      onCustomAction={handleUpdateRegistration}
+      idField="registration_id"
+      handleError={handleError}
     />
   );
 };

@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import './Table.css';
 
-const Table = ({ columns, data, onEdit, onDelete }) => {
+const Table = ({ columns, data, onEdit, onDelete, idField = 'id' }) => {
   return (
     <div className="table-responsive">
       <table className="custom-table">
@@ -14,37 +14,39 @@ const Table = ({ columns, data, onEdit, onDelete }) => {
             {columns.map((column) => (
               <th key={column.key}>{column.title}</th>
             ))}
-            <th>Actions</th>
+            {(onEdit || onDelete) && <th>Actions</th>}
           </tr>
         </thead>
         <tbody>
           {data.map((item) => (
-            <tr key={item.id || item.student_id}>
+            <tr key={item[idField]}>
               {columns.map((column) => (
-                <td key={`${item.id || item.student_id}-${column.key}`}>
+                <td key={`${item[idField]}-${column.key}`}>
                   {column.render ? column.render(item) : item[column.key]}
                 </td>
               ))}
-              <td>
-                <div className="action-buttons">
-                  {onEdit && (
-                    <Button
-                      className="edit-btn"
-                      onClick={() => onEdit(item)}
-                    >
-                      <FontAwesomeIcon icon={faEdit} />
-                    </Button>
-                  )}
-                  {onDelete && (
-                    <Button
-                      className="delete-btn"
-                      onClick={() => onDelete(item.id || item.student_id)}
-                    >
-                      <FontAwesomeIcon icon={faTrash} />
-                    </Button>
-                  )}
-                </div>
-              </td>
+              {(onEdit || onDelete) && (
+                <td>
+                  <div className="action-buttons">
+                    {onEdit && (
+                      <Button
+                        className="edit-btn"
+                        onClick={() => onEdit(item)}
+                      >
+                        <FontAwesomeIcon icon={faEdit} />
+                      </Button>
+                    )}
+                    {onDelete && (
+                      <Button
+                        className="delete-btn"
+                        onClick={() => onDelete(item[idField])}
+                      >
+                        <FontAwesomeIcon icon={faTrash} />
+                      </Button>
+                    )}
+                  </div>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

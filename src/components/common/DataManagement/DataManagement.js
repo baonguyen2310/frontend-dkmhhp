@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './DataManagement.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
@@ -20,7 +20,9 @@ const DataManagement = ({
   renderForm,
   disableAdd = false,
   disableEdit = false,
-  disableDelete = false
+  disableDelete = false,
+  idField = 'id',
+  handleError
 }) => {
   const [data, setData] = useState([]);
   const [selectedItem, setSelectedItem] = useState(initialDataState);
@@ -31,11 +33,7 @@ const DataManagement = ({
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setIsLoading(true);
     try {
       const fetchedData = await fetchData();
@@ -43,10 +41,15 @@ const DataManagement = ({
     } catch (error) {
       console.error(`Error fetching ${title}:`, error);
       showNotification(`Failed to load ${title}.`, 'error');
+      handleError(error);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [fetchData, title, handleError]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -69,7 +72,7 @@ const DataManagement = ({
     setIsLoading(true);
     try {
       if (isEditing) {
-        await updateData(selectedItem);
+        await updateData(selectedItem[idField], selectedItem);
         showNotification(`${title} updated successfully!`, 'success');
       } else {
         await addData(selectedItem);
@@ -82,6 +85,7 @@ const DataManagement = ({
     } catch (error) {
       console.error(`Error saving ${title}:`, error);
       showNotification(`Failed to save ${title}.`, 'error');
+      handleError(error);
     } finally {
       setIsLoading(false);
     }
@@ -101,7 +105,8 @@ const DataManagement = ({
         showNotification(`${title} deleted successfully!`, 'success');
       } catch (error) {
         console.error(`Error deleting ${title}:`, error);
-        showNotification(`Failed to delete ${title}. The item may have related data.`, 'error');
+        showNotification(`Failed to delete ${title}.`, 'error');
+        handleError(error);
       } finally {
         setIsLoading(false);
         setIsConfirmDialogOpen(false);
@@ -142,6 +147,7 @@ const DataManagement = ({
             data={data}
             onEdit={disableEdit ? null : openModal}
             onDelete={disableDelete ? null : handleDeleteClick}
+            idField={idField}
           />
         </div>
       </div>

@@ -47,12 +47,12 @@
 }
 
 .edit-btn {
-  background-color: #4CAF50;
+  background-color: #FFA500; /* A moderate orange color */
   color: white;
 }
 
 .delete-btn {
-  background-color: #f44336;
+  background-color: #EF4444; /* A moderate red color */
   color: white;
 }
 

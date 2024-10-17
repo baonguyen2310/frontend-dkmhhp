@@ -1,8 +1,8 @@
 // frontend-dkmhhp/src/components/StudentManagement/StudentManagement.js
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import DataManagement from '../common/DataManagement/DataManagement';
-import { fetchStudents, addStudent, updateStudent, deleteStudent } from '../../services/api';
+import { fetchStudents, addStudent, updateStudent, deleteStudent, fetchClasses } from '../../services/api';
 import FormInput from '../common/FormInput';
 import Button from '../common/Button';
 
@@ -14,10 +14,35 @@ const initialStudentState = {
   gender: '',
   hometown: '',
   priority: '',
-  contact_address: ''
+  contact_address: '',
+  class_id: ''
+};
+
+const handleError = (error) => {
+  if (error.response && error.response.data) {
+    const errorMessage = error.response.data.message || 'An error occurred';
+    // Hiển thị thông báo lỗi cho người dùng (ví dụ: sử dụng một component Toast hoặc Alert)
+    console.error(errorMessage);
+  } else {
+    console.error('An unexpected error occurred');
+  }
 };
 
 const StudentManagement = () => {
+  const [classes, setClasses] = useState([]);
+
+  useEffect(() => {
+    const loadClasses = async () => {
+      try {
+        const fetchedClasses = await fetchClasses();
+        setClasses(fetchedClasses);
+      } catch (error) {
+        console.error('Error fetching classes:', error);
+      }
+    };
+    loadClasses();
+  }, []);
+
   const columns = [
     { key: 'student_id', title: 'Student ID' },
     { key: 'first_name', title: 'First Name' },
@@ -26,7 +51,14 @@ const StudentManagement = () => {
     { key: 'gender', title: 'Gender' },
     { key: 'hometown', title: 'Hometown' },
     { key: 'priority', title: 'Priority' },
-    { key: 'contact_address', title: 'Contact Address' },
+    { 
+      key: 'class_id', 
+      title: 'Class', 
+      render: (student) => {
+        const classObj = classes.find(c => c.class_id === student.class_id);
+        return classObj ? classObj.class_name : 'N/A';
+      }
+    }
   ];
 
   const renderForm = ({ handleSubmit, handleChange, selectedItem, isEditing, closeModal }) => (
@@ -65,11 +97,16 @@ const StudentManagement = () => {
         required
       />
       <FormInput
-        type="text"
+        type="select"
         name="gender"
         placeholder="Gender"
         value={selectedItem.gender}
         onChange={handleChange}
+        options={[
+          { value: 'Male', label: 'Male' },
+          { value: 'Female', label: 'Female' }
+        ]}
+        required
       />
       <FormInput
         type="text"
@@ -92,6 +129,15 @@ const StudentManagement = () => {
         value={selectedItem.contact_address}
         onChange={handleChange}
       />
+      <FormInput
+        type="select"
+        name="class_id"
+        placeholder="Class"
+        value={selectedItem.class_id}
+        onChange={handleChange}
+        options={classes.map(c => ({ value: c.class_id, label: c.class_name }))}
+        required
+      />
       <div className="form-actions">
         <Button type="submit" className="submit-btn">
           {isEditing ? 'Update Student' : 'Add Student'}
@@ -113,6 +159,8 @@ const StudentManagement = () => {
       initialDataState={initialStudentState}
       columns={columns}
       renderForm={renderForm}
+      idField="student_id"
+      handleError={handleError}
     />
   );
 };

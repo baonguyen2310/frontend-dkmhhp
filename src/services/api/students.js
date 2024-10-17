@@ -36,9 +36,16 @@ export const deleteStudent = async (studentId) => {
     return response.data;
   } catch (error) {
     console.error('Error deleting student:', error);
-    if (error.response && error.response.data && error.response.data.message) {
-      throw new Error(error.response.data.message);
-    }
+    throw error;
+  }
+};
+
+export const fetchClasses = async () => {
+  try {
+    const response = await axiosInstance.get('/students/classes');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching classes:', error);
     throw error;
   }
 };
