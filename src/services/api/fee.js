@@ -10,35 +10,7 @@ export const fetchFees = async () => {
   }
 };
 
-export const addFee = async (feeData) => {
-  try {
-    const response = await axiosInstance.post('/fees', feeData);
-    return response.data;
-  } catch (error) {
-    console.error('Error adding fee:', error);
-    throw error;
-  }
-};
-
-export const updateFee = async (feeId, feeData) => {
-  try {
-    const response = await axiosInstance.put(`/fees/${feeId}`, feeData);
-    return response.data;
-  } catch (error) {
-    console.error('Error updating fee:', error);
-    throw error;
-  }
-};
-
-export const deleteFee = async (feeId) => {
-  try {
-    const response = await axiosInstance.delete(`/fees/${feeId}`);
-    return response.data;
-  } catch (error) {
-    console.error('Error deleting fee:', error);
-    throw error;
-  }
-};
+// Xóa các hàm addFee, updateFee, và deleteFee vì Fee Management chỉ cho phép xem
 
 export const getUnpaidStudents = async (semesterId) => {
   try {
@@ -56,17 +28,6 @@ export const sendUnpaidStudentsReport = async (semesterId) => {
     return response.data;
   } catch (error) {
     console.error('Error sending unpaid students report:', error);
-    throw error;
-  }
-};
-
-// Thêm hai hàm mới này
-export const makePayment = async (feeId, paymentData) => {
-  try {
-    const response = await axiosInstance.post(`/fees/${feeId}/payments`, paymentData);
-    return response.data;
-  } catch (error) {
-    console.error('Error making payment:', error);
     throw error;
   }
 };

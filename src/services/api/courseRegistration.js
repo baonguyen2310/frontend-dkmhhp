@@ -39,3 +39,25 @@ export const deleteCourseRegistration = async (registrationId) => {
     throw error;
   }
 };
+
+export const finalizeCourseRegistration = async (studentId, semesterId) => {
+  try {
+    const response = await axiosInstance.post('/course-registrations/finalize', { studentId, semesterId });
+    return response.data;
+  } catch (error) {
+    console.error('Error finalizing course registration:', error);
+    throw error;
+  }
+};
+
+export const fetchRegistrationSummary = async (studentId, semesterId) => {
+  try {
+    const response = await axiosInstance.get(`/course-registrations/summary`, {
+      params: { studentId, semesterId }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching registration summary:', error);
+    throw error;
+  }
+};

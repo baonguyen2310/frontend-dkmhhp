@@ -49,3 +49,14 @@ export const fetchClasses = async () => {
     throw error;
   }
 };
+
+// Thêm hàm mới để fetch thông tin giảm giá học phí
+export const fetchFeeDiscounts = async () => {
+  try {
+    const response = await axiosInstance.get('/students/fee-discounts');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching fee discounts:', error);
+    throw error;
+  }
+};

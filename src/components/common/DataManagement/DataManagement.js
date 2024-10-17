@@ -105,7 +105,7 @@ const DataManagement = ({
         showNotification(`${title} deleted successfully!`, 'success');
       } catch (error) {
         console.error(`Error deleting ${title}:`, error);
-        showNotification(`Failed to delete ${title}.`, 'error');
+        showNotification(error.message || `Failed to delete ${title}.`, 'error');
         handleError(error);
       } finally {
         setIsLoading(false);
@@ -137,7 +137,10 @@ const DataManagement = ({
           <div className="list-header">
             <h3>{title} List</h3>
             {!disableAdd && (
-              <Button icon={faPlus} className="add-btn" onClick={() => openModal()}>
+              <Button icon={faPlus} className="add-btn" onClick={() => {
+                console.log('Add button clicked in DataManagement'); // Thêm dòng này
+                openModal();
+              }}>
                 Add {title}
               </Button>
             )}
@@ -151,14 +154,16 @@ const DataManagement = ({
           />
         </div>
       </div>
-      {!disableAdd && !disableEdit && renderForm && (
-        <Modal
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          title={isEditing ? `Edit ${title}` : `Add New ${title}`}
-        >
-          {renderForm({ handleSubmit, handleChange, selectedItem, isEditing, closeModal })}
-        </Modal>
+      {renderForm && (
+        <>
+          <Modal
+            isOpen={isModalOpen}
+            onClose={closeModal}
+            title={isEditing ? `Edit ${title}` : `Add New ${title}`}
+          >
+            {renderForm({ handleSubmit, handleChange, selectedItem, isEditing, closeModal })}
+          </Modal>
+        </>
       )}
       {notification && (
         <Notification

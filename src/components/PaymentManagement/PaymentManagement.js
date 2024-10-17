@@ -12,6 +12,15 @@ const initialPaymentState = {
   amount_paid: ''
 };
 
+const handleError = (error) => {
+  if (error.response && error.response.data) {
+    const errorMessage = error.response.data.message || 'An error occurred';
+    console.error(errorMessage);
+  } else {
+    console.error('An unexpected error occurred');
+  }
+};
+
 const PaymentManagement = () => {
   const [students, setStudents] = useState([]);
   const [fees, setFees] = useState([]);
@@ -27,6 +36,7 @@ const PaymentManagement = () => {
         setFees(fetchedFees);
       } catch (error) {
         console.error('Error fetching data:', error);
+        handleError(error);
       }
     };
     loadData();
@@ -43,11 +53,8 @@ const PaymentManagement = () => {
     { key: 'semester_name', title: 'Semester' }
   ];
 
-  const renderForm = ({ handleSubmit, handleChange, selectedItem, closeModal }) => (
-    <form onSubmit={(e) => {
-      e.preventDefault();
-      handleSubmit(selectedItem);
-    }}>
+  const renderForm = ({ handleSubmit, handleChange, selectedItem, isEditing, closeModal }) => (
+    <form onSubmit={handleSubmit}>
       <FormInput
         type="select"
         name="fee_id"
@@ -79,7 +86,7 @@ const PaymentManagement = () => {
       />
       <div className="form-actions">
         <Button type="submit" className="submit-btn">
-          Add Payment
+          {isEditing ? 'Update Payment' : 'Add Payment'}
         </Button>
         <Button type="button" onClick={closeModal} className="cancel-btn">
           Cancel
@@ -88,28 +95,18 @@ const PaymentManagement = () => {
     </form>
   );
 
-  const handleAddPayment = async (paymentData) => {
-    console.log('Adding payment:', paymentData);
-    try {
-      const response = await addPayment(paymentData);
-      console.log('Payment added successfully:', response);
-      return { success: true, message: 'Payment added successfully', data: response };
-    } catch (error) {
-      console.error('Error adding payment:', error);
-      return { success: false, message: error.response?.data?.message || 'Failed to add payment' };
-    }
-  };
-
   return (
     <DataManagement
       title="Payment"
       fetchData={fetchPayments}
-      addData={handleAddPayment}
+      addData={addPayment}
       initialDataState={initialPaymentState}
       columns={columns}
       renderForm={renderForm}
-      disableEdit={true}
+      idField="payments_id"
+      handleError={handleError}
       disableDelete={true}
+      disableEdit={true}
     />
   );
 };

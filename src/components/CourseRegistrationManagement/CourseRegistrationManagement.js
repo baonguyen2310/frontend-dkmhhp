@@ -1,46 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import DataManagement from '../common/DataManagement/DataManagement';
+import Modal from '../common/Modal/Modal';
 import {
   fetchCourseRegistrations,
   addCourseRegistration,
   updateCourseRegistration,
   deleteCourseRegistration,
-  fetchStudents,
-  fetchCourses
-} from '../../services/api';
+  finalizeCourseRegistration,
+  fetchRegistrationSummary
+} from '../../services/api/courseRegistration';
+import { fetchStudents } from '../../services/api/students';
+import { fetchCourses } from '../../services/api/courses';
+import { fetchSemesters } from '../../services/api/semester';
 import FormInput from '../common/FormInput';
 import Button from '../common/Button';
-
-const initialRegistrationState = {
-  student_id: '',
-  course_id: '',
-  semester_id: '',
-  registration_date: new Date().toISOString().split('T')[0],
-  registration_status: 'Pending'
-};
-
-const handleError = (error) => {
-  if (error.response && error.response.data) {
-    const errorMessage = error.response.data.message || 'An error occurred';
-    console.error(errorMessage);
-  } else {
-    console.error('An unexpected error occurred');
-  }
-};
 
 const CourseRegistrationManagement = () => {
   const [students, setStudents] = useState([]);
   const [courses, setCourses] = useState([]);
+  const [semesters, setSemesters] = useState([]);
+  const [selectedStudentId, setSelectedStudentId] = useState('');
+  const [selectedSemesterId, setSelectedSemesterId] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [registrationSummary, setRegistrationSummary] = useState(null);
+
+  const handleError = (error) => {
+    console.error('An error occurred:', error);
+    alert('An error occurred. Please try again.');
+  };
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [fetchedStudents, fetchedCourses] = await Promise.all([
+        const [fetchedStudents, fetchedCourses, fetchedSemesters] = await Promise.all([
           fetchStudents(),
-          fetchCourses()
+          fetchCourses(),
+          fetchSemesters()
         ]);
         setStudents(fetchedStudents);
         setCourses(fetchedCourses);
+        setSemesters(fetchedSemesters);
       } catch (error) {
         console.error('Error fetching data:', error);
         handleError(error);
@@ -48,6 +47,46 @@ const CourseRegistrationManagement = () => {
     };
     loadData();
   }, []);
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleFetchSummary = async () => {
+    if (!selectedStudentId || !selectedSemesterId) {
+      alert('Please select both a student and a semester.');
+      return;
+    }
+
+    try {
+      const summary = await fetchRegistrationSummary(selectedStudentId, selectedSemesterId);
+      setRegistrationSummary(summary);
+    } catch (error) {
+      console.error('Error fetching registration summary:', error);
+      handleError(error);
+      alert('Failed to fetch registration summary. Please try again.');
+    }
+  };
+
+  const handleFinalize = async () => {
+    if (!selectedStudentId || !selectedSemesterId) {
+      alert('Please select both a student and a semester.');
+      return;
+    }
+
+    try {
+      const result = await finalizeCourseRegistration(selectedStudentId, selectedSemesterId);
+      console.log('Course registration finalized:', result);
+      alert('Course registration finalized successfully. Tuition fee has been calculated.');
+      setIsModalOpen(false);
+      // Refresh the course registrations data
+      // You might want to call a function here to refresh the data in DataManagement
+    } catch (error) {
+      console.error('Error finalizing course registration:', error);
+      handleError(error);
+      alert('Failed to finalize course registration. Please try again.');
+    }
+  };
 
   const columns = [
     { key: 'registration_id', title: 'Registration ID' },
@@ -133,18 +172,62 @@ const CourseRegistrationManagement = () => {
   );
 
   return (
-    <DataManagement
-      title="Course Registration"
-      fetchData={fetchCourseRegistrations}
-      addData={addCourseRegistration}
-      updateData={updateCourseRegistration}
-      deleteData={deleteCourseRegistration}
-      initialDataState={initialRegistrationState}
-      columns={columns}
-      renderForm={renderForm}
-      idField="registration_id"
-      handleError={handleError}
-    />
+    <div>
+      <h2>Course Registration Management</h2>
+      <Button onClick={handleOpenModal} className="finalize-btn">
+        Finalize Registration
+      </Button>
+      <DataManagement
+        title="Course Registration"
+        fetchData={fetchCourseRegistrations}
+        addData={addCourseRegistration}
+        updateData={updateCourseRegistration}
+        deleteData={deleteCourseRegistration}
+        initialDataState={{}} // Define your initial state here
+        columns={columns}
+        renderForm={renderForm}
+        idField="registration_id"
+        handleError={handleError}
+      />
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <h3>Finalize Course Registration</h3>
+        <FormInput
+          type="select"
+          name="student_id"
+          placeholder="Select Student"
+          value={selectedStudentId}
+          onChange={(e) => setSelectedStudentId(e.target.value)}
+          options={students.map(s => ({ value: s.student_id, label: `${s.first_name} ${s.last_name}` }))}
+        />
+        <FormInput
+          type="select"
+          name="semester_id"
+          placeholder="Select Semester"
+          value={selectedSemesterId}
+          onChange={(e) => setSelectedSemesterId(e.target.value)}
+          options={semesters.map(s => ({ value: s.semester_id, label: s.semester_name }))}
+        />
+        <Button onClick={handleFetchSummary} className="fetch-summary-btn">
+          Fetch Summary
+        </Button>
+        {registrationSummary && (
+          <div>
+            <h4>Registration Summary</h4>
+            <p>Student: {registrationSummary.studentName}</p>
+            <p>Semester: {registrationSummary.semesterName}</p>
+            <p>Total Courses: {registrationSummary.totalCourses}</p>
+            <p>Total Credits: {registrationSummary.totalCredits}</p>
+            <p>Estimated Tuition Fee: ${registrationSummary.estimatedTuitionFee}</p>
+          </div>
+        )}
+        <Button onClick={handleFinalize} className="confirm-btn" disabled={!registrationSummary}>
+          Confirm and Finalize
+        </Button>
+        <Button onClick={() => setIsModalOpen(false)} className="cancel-btn">
+          Cancel
+        </Button>
+      </Modal>
+    </div>
   );
 };
 

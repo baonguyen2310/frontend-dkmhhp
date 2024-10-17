@@ -125,23 +125,13 @@ const CourseManagement = () => {
     }
   };
 
-  const handleDeleteCourse = async (courseId) => {
-    try {
-      await deleteCourse(courseId);
-      return { success: true, message: 'Course deleted successfully' };
-    } catch (error) {
-      handleError(error);
-      return { success: false, message: 'An error occurred' };
-    }
-  };
-
   return (
     <DataManagement
       title="Course"
       fetchData={fetchCourses}
       addData={handleAddCourse}
       updateData={handleUpdateCourse}
-      deleteData={handleDeleteCourse}
+      deleteData={deleteCourse}
       initialDataState={initialCourseState}
       columns={columns}
       renderForm={renderForm}

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import DataManagement from '../common/DataManagement/DataManagement';
-import { fetchStudents, addStudent, updateStudent, deleteStudent, fetchClasses } from '../../services/api';
+import { fetchStudents, addStudent, updateStudent, deleteStudent, fetchClasses, fetchFeeDiscounts } from '../../services/api';
 import FormInput from '../common/FormInput';
 import Button from '../common/Button';
 
@@ -13,7 +13,7 @@ const initialStudentState = {
   date_of_birth: '',
   gender: '',
   hometown: '',
-  priority: '',
+  discount_id: '',
   contact_address: '',
   class_id: ''
 };
@@ -30,17 +30,22 @@ const handleError = (error) => {
 
 const StudentManagement = () => {
   const [classes, setClasses] = useState([]);
+  const [feeDiscounts, setFeeDiscounts] = useState([]);
 
   useEffect(() => {
-    const loadClasses = async () => {
+    const loadData = async () => {
       try {
-        const fetchedClasses = await fetchClasses();
+        const [fetchedClasses, fetchedFeeDiscounts] = await Promise.all([
+          fetchClasses(),
+          fetchFeeDiscounts()
+        ]);
         setClasses(fetchedClasses);
+        setFeeDiscounts(fetchedFeeDiscounts);
       } catch (error) {
-        console.error('Error fetching classes:', error);
+        console.error('Error fetching data:', error);
       }
     };
-    loadClasses();
+    loadData();
   }, []);
 
   const columns = [
@@ -49,8 +54,14 @@ const StudentManagement = () => {
     { key: 'last_name', title: 'Last Name' },
     { key: 'date_of_birth', title: 'Date of Birth', render: (student) => new Date(student.date_of_birth).toLocaleDateString() },
     { key: 'gender', title: 'Gender' },
-    { key: 'hometown', title: 'Hometown' },
-    { key: 'priority', title: 'Priority' },
+    { 
+      key: 'discount_id', 
+      title: 'Fee Discount', 
+      render: (student) => {
+        const discount = feeDiscounts.find(d => d.discount_id === student.discount_id);
+        return discount ? `${discount.discount_type} (${discount.discount_percent}%)` : 'N/A';
+      }
+    },
     { 
       key: 'class_id', 
       title: 'Class', 
@@ -116,11 +127,12 @@ const StudentManagement = () => {
         onChange={handleChange}
       />
       <FormInput
-        type="text"
-        name="priority"
-        placeholder="Priority"
-        value={selectedItem.priority}
+        type="select"
+        name="discount_id"
+        placeholder="Fee Discount"
+        value={selectedItem.discount_id}
         onChange={handleChange}
+        options={feeDiscounts.map(d => ({ value: d.discount_id, label: `${d.discount_type} (${d.discount_percent}%)` }))}
       />
       <FormInput
         type="text"

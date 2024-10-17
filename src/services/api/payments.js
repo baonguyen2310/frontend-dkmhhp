@@ -22,25 +22,7 @@ export const addPayment = async (paymentData) => {
   }
 };
 
-export const updatePayment = async (paymentId, paymentData) => {
-  try {
-    const response = await axiosInstance.put(`/payments/${paymentId}`, paymentData);
-    return response.data;
-  } catch (error) {
-    console.error('Error updating payment:', error);
-    throw error;
-  }
-};
-
-export const deletePayment = async (paymentId) => {
-  try {
-    const response = await axiosInstance.delete(`/payments/${paymentId}`);
-    return response.data;
-  } catch (error) {
-    console.error('Error deleting payment:', error);
-    throw error;
-  }
-};
+// Xóa các hàm updatePayment và deletePayment vì Payment Management chỉ cho phép thêm mới và xem
 
 export const fetchPaymentsByStudent = async (studentId) => {
   try {
@@ -61,4 +43,3 @@ export const fetchPaymentsBySemester = async (semesterId) => {
     throw error;
   }
 };
-
