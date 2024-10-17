@@ -38,7 +38,7 @@ const Dashboard = () => {
     { id: 'CourseManagement', icon: faBook, label: 'Course Management' },
     { id: 'CourseRegistrationManagement', icon: faClipboardList, label: 'Course Registration' },
     { id: 'FeeManagement', icon: faMoneyBill, label: 'Fee Management' },
-    { id: 'PaymentManagement', icon: faMoneyBill, label: 'Payment Management' },
+    { id: 'PaymentManagement', icon: faMoneyBill, label: 'Payments' },
     { id: 'UnpaidStudentsReport', icon: faExclamationTriangle, label: 'Unpaid Students' },
   ];
 

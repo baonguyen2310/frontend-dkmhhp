@@ -8,7 +8,6 @@ import Button from '../common/Button';
 
 const initialPaymentState = {
   fee_id: '',
-  payment_date: new Date().toISOString().split('T')[0],
   amount_paid: ''
 };
 
@@ -50,56 +49,88 @@ const PaymentManagement = () => {
     { key: 'last_name', title: 'Last Name' },
     { key: 'payment_date', title: 'Payment Date', render: (payment) => new Date(payment.payment_date).toLocaleDateString() },
     { key: 'amount_paid', title: 'Amount Paid', render: (payment) => `$${payment.amount_paid.toFixed(2)}` },
-    { key: 'semester_name', title: 'Semester' }
+    { key: 'is_early_payment', title: 'Early Payment', render: (payment) => payment.is_early_payment ? 'Yes' : 'No' }
   ];
 
-  const renderForm = ({ handleSubmit, handleChange, selectedItem, isEditing, closeModal }) => (
-    <form onSubmit={handleSubmit}>
-      <FormInput
-        type="select"
-        name="fee_id"
-        placeholder="Fee"
-        value={selectedItem.fee_id}
-        onChange={handleChange}
-        options={fees.map(fee => ({ 
-          value: fee.fee_id, 
-          label: `${fee.fee_id} - ${students.find(s => s.student_id === fee.student_id)?.first_name} ${students.find(s => s.student_id === fee.student_id)?.last_name} - $${fee.total_amount}`
-        }))}
-        required
-      />
-      <FormInput
-        type="date"
-        name="payment_date"
-        placeholder="Payment Date"
-        value={selectedItem.payment_date}
-        onChange={handleChange}
-        required
-      />
-      <FormInput
-        type="number"
-        name="amount_paid"
-        placeholder="Amount Paid"
-        value={selectedItem.amount_paid}
-        onChange={handleChange}
-        required
-        step="0.01"
-      />
-      <div className="form-actions">
-        <Button type="submit" className="submit-btn">
-          {isEditing ? 'Update Payment' : 'Add Payment'}
-        </Button>
-        <Button type="button" onClick={closeModal} className="cancel-btn">
-          Cancel
-        </Button>
-      </div>
-    </form>
-  );
+  const renderForm = ({ handleSubmit, handleChange, selectedItem, closeModal }) => {
+    // Lọc ra các khoản phí chưa được thanh toán đầy đủ
+    const unpaidFees = fees.filter(fee => fee.amount_paid < (fee.tuition_fee - fee.discount));
+
+    const selectedFee = unpaidFees.find(fee => fee.fee_id === selectedItem.fee_id);
+    const remainingBalance = selectedFee ? selectedFee.tuition_fee - selectedFee.discount - selectedFee.amount_paid : 0;
+
+    return (
+      <form onSubmit={handleSubmit}>
+        <FormInput
+          type="select"
+          name="fee_id"
+          placeholder="Fee"
+          value={selectedItem.fee_id}
+          onChange={handleChange}
+          options={unpaidFees.map(fee => ({ 
+            value: fee.fee_id, 
+            label: `${fee.fee_id} - ${students.find(s => s.student_id === fee.student_id)?.first_name} ${students.find(s => s.student_id === fee.student_id)?.last_name} - Remaining: $${(fee.tuition_fee - fee.discount - fee.amount_paid).toFixed(2)}`
+          }))}
+          required
+        />
+        <FormInput
+          type="number"
+          name="amount_paid"
+          placeholder="Amount Paid"
+          value={selectedItem.amount_paid}
+          onChange={handleChange}
+          required
+          step="0.01"
+          max={remainingBalance}
+        />
+        <div className="form-actions">
+          <Button type="submit" className="submit-btn">
+            Add Payment
+          </Button>
+          <Button type="button" onClick={closeModal} className="cancel-btn">
+            Cancel
+          </Button>
+        </div>
+      </form>
+    );
+  };
+
+  const handleAddPayment = async (paymentData) => {
+    try {
+      const formattedPaymentData = {
+        ...paymentData,
+        amount_paid: parseFloat(paymentData.amount_paid)
+      };
+      
+      const result = await addPayment(formattedPaymentData);
+      
+      // Hiển thị thông báo kết quả thanh toán
+      if (result.payment.is_early_payment) {
+        alert(`Payment successful! 
+               Amount paid: $${result.payment.amount_paid.toFixed(2)}
+               Early payment discount applied: Yes
+               Total amount paid: $${result.payment.total_amount_paid.toFixed(2)}
+               Remaining balance: $${(result.payment.tuition_fee - result.payment.discount - result.payment.total_amount_paid).toFixed(2)}`);
+      } else {
+        alert(`Payment successful! 
+               Amount paid: $${result.payment.amount_paid.toFixed(2)}
+               Total amount paid: $${result.payment.total_amount_paid.toFixed(2)}
+               Remaining balance: $${(result.payment.tuition_fee - result.payment.discount - result.payment.total_amount_paid).toFixed(2)}`);
+      }
+      
+      // Refresh data
+      // Giả sử DataManagement component có prop onDataChange để trigger refresh
+      // Nếu không, bạn có thể cần implement logic refresh riêng
+    } catch (error) {
+      handleError(error);
+    }
+  };
 
   return (
     <DataManagement
       title="Payment"
       fetchData={fetchPayments}
-      addData={addPayment}
+      addData={handleAddPayment}
       initialDataState={initialPaymentState}
       columns={columns}
       renderForm={renderForm}

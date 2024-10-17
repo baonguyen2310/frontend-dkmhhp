@@ -78,3 +78,51 @@
     padding: 8px;
   }
 }
+
+/* Thêm vào cuối file, sau các styles hiện có */
+
+.action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 123, 255, 0.3);
+  text-decoration: none;
+  margin: 15px;
+}
+
+.action-button:hover {
+  background-color: #0056b3;
+  box-shadow: 0 4px 8px rgba(0, 86, 179, 0.4);
+}
+
+.action-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 4px rgba(0, 86, 179, 0.4);
+}
+
+.action-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.action-button svg {
+  margin-right: 8px;
+}
+
+.send-report-btn {
+  background-color: #17a2b8;
+}
+
+.send-report-btn:hover {
+  background-color: #138496;
+}

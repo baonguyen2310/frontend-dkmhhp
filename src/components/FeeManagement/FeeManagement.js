@@ -8,7 +8,13 @@ const FeeManagement = () => {
     { key: 'student_id', title: 'Student ID' },
     { key: 'semester_id', title: 'Semester ID' },
     { key: 'tuition_fee', title: 'Tuition Fee', render: (fee) => `$${fee.tuition_fee.toFixed(2)}` },
+    { key: 'discount', title: 'Discount', render: (fee) => `$${fee.discount.toFixed(2)}` },
     { key: 'amount_paid', title: 'Amount Paid', render: (fee) => `$${fee.amount_paid.toFixed(2)}` },
+    { 
+      key: 'remaining_balance', 
+      title: 'Remaining Balance', 
+      render: (fee) => `$${(fee.tuition_fee - fee.discount - fee.amount_paid).toFixed(2)}` 
+    },
     { key: 'payment_status', title: 'Payment Status' }
   ];
 

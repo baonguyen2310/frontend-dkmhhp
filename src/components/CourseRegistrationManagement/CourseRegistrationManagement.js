@@ -14,6 +14,8 @@ import { fetchCourses } from '../../services/api/courses';
 import { fetchSemesters } from '../../services/api/semester';
 import FormInput from '../common/FormInput';
 import Button from '../common/Button';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 
 const CourseRegistrationManagement = () => {
   const [students, setStudents] = useState([]);
@@ -106,7 +108,14 @@ const CourseRegistrationManagement = () => {
         return course ? course.course_name : registration.course_id;
       }
     },
-    { key: 'semester_id', title: 'Semester ID' },
+    { 
+      key: 'semester_id', 
+      title: 'Semester', 
+      render: (registration) => {
+        const semester = semesters.find(s => s.semester_id === registration.semester_id);
+        return semester ? semester.semester_name : registration.semester_id;
+      }
+    },
     { key: 'registration_date', title: 'Registration Date', render: (registration) => new Date(registration.registration_date).toLocaleDateString() },
     { key: 'registration_status', title: 'Status' }
   ];
@@ -132,19 +141,12 @@ const CourseRegistrationManagement = () => {
         required
       />
       <FormInput
-        type="text"
+        type="select"
         name="semester_id"
-        placeholder="Semester ID"
+        placeholder="Semester"
         value={selectedItem.semester_id}
         onChange={handleChange}
-        required
-      />
-      <FormInput
-        type="date"
-        name="registration_date"
-        placeholder="Registration Date"
-        value={selectedItem.registration_date}
-        onChange={handleChange}
+        options={semesters.map(s => ({ value: s.semester_id, label: s.semester_name }))}
         required
       />
       <FormInput
@@ -173,22 +175,26 @@ const CourseRegistrationManagement = () => {
 
   return (
     <div>
-      <h2>Course Registration Management</h2>
-      <Button onClick={handleOpenModal} className="finalize-btn">
-        Finalize Registration
-      </Button>
       <DataManagement
         title="Course Registration"
         fetchData={fetchCourseRegistrations}
         addData={addCourseRegistration}
         updateData={updateCourseRegistration}
         deleteData={deleteCourseRegistration}
-        initialDataState={{}} // Define your initial state here
+        initialDataState={{
+          student_id: '',
+          course_id: '',
+          semester_id: '',
+          registration_status: 'Pending'
+        }}
         columns={columns}
         renderForm={renderForm}
         idField="registration_id"
         handleError={handleError}
       />
+      <Button onClick={handleOpenModal} className="action-button finalize-btn">
+        <FontAwesomeIcon icon={faCheckCircle} /> Finalize Registration
+      </Button>
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <h3>Finalize Course Registration</h3>
         <FormInput

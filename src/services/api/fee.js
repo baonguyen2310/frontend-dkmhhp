@@ -12,9 +12,9 @@ export const fetchFees = async () => {
 
 // Xóa các hàm addFee, updateFee, và deleteFee vì Fee Management chỉ cho phép xem
 
-export const getUnpaidStudents = async (semesterId) => {
+export const getUnpaidStudents = async () => {
   try {
-    const response = await axiosInstance.get(`/fees/unpaid-students/${semesterId}`);
+    const response = await axiosInstance.get('/fees/unpaid-students');
     return response.data;
   } catch (error) {
     console.error('Error fetching unpaid students:', error);

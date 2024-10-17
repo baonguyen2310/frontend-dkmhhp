@@ -3,63 +3,59 @@ import { getUnpaidStudents, sendUnpaidStudentsReport } from '../../services/api/
 import './UnpaidStudentsReport.css';
 // ... other imports ...
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+
 const UnpaidStudentsReport = () => {
   const [unpaidStudents, setUnpaidStudents] = useState([]);
-  const [selectedSemester, setSelectedSemester] = useState('');
-  const [semesters, setSemesters] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Fetch semesters list
-    // This is a placeholder. You need to implement the API to fetch semesters.
-    fetchSemesters();
+    fetchUnpaidStudents();
   }, []);
 
-  const fetchSemesters = async () => {
-    // Implement this function to fetch semesters from your API
-    // setSemesters(fetchedSemesters);
-  };
-
-  const handleFetchUnpaidStudents = async () => {
+  const fetchUnpaidStudents = async () => {
     try {
-      const students = await getUnpaidStudents(selectedSemester);
+      setIsLoading(true);
+      const students = await getUnpaidStudents();
       setUnpaidStudents(students);
     } catch (error) {
       console.error('Error fetching unpaid students:', error);
-      // Show error notification
+      setError('Failed to fetch unpaid students. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleSendReport = async () => {
     try {
-      await sendUnpaidStudentsReport(selectedSemester);
-      // Show success notification
+      setIsLoading(true);
+      await sendUnpaidStudentsReport();
+      alert('Report sent successfully to the finance department.');
     } catch (error) {
-      console.error('Error sending unpaid students report:', error);
-      // Show error notification
+      console.error('Error sending report:', error);
+      setError('Failed to send report. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div className="error">{error}</div>;
 
   return (
     <div className="unpaid-students-report">
       <h2>Unpaid Students Report</h2>
-      <div className="controls">
-        <select value={selectedSemester} onChange={(e) => setSelectedSemester(e.target.value)}>
-          <option value="">Select Semester</option>
-          {semesters.map(semester => (
-            <option key={semester.semester_id} value={semester.semester_id}>
-              {semester.semester_name}
-            </option>
-          ))}
-        </select>
-        <button onClick={handleFetchUnpaidStudents}>Fetch Unpaid Students</button>
-        <button onClick={handleSendReport}>Send Report to Academic Affairs</button>
-      </div>
-
+      <button onClick={handleSendReport} disabled={isLoading} className="action-button send-report-btn">
+        <FontAwesomeIcon icon={faPaperPlane} /> Send Report to Finance Department
+      </button>
       <table className="unpaid-students-table">
         <thead>
           <tr>
             <th>Student ID</th>
             <th>Name</th>
+            <th>Semester</th>
             <th>Tuition Fee</th>
             <th>Amount Paid</th>
             <th>Remaining Balance</th>
@@ -67,12 +63,13 @@ const UnpaidStudentsReport = () => {
         </thead>
         <tbody>
           {unpaidStudents.map(student => (
-            <tr key={student.student_id}>
+            <tr key={`${student.student_id}-${student.semester_id}`}>
               <td>{student.student_id}</td>
               <td>{`${student.last_name} ${student.first_name}`}</td>
-              <td>{student.tuition_fee}</td>
-              <td>{student.amount_paid}</td>
-              <td>{student.remaining_balance}</td>
+              <td>{student.semester_id}</td>
+              <td>{student.tuition_fee.toFixed(2)}</td>
+              <td>{student.amount_paid.toFixed(2)}</td>
+              <td>{student.remaining_balance.toFixed(2)}</td>
             </tr>
           ))}
         </tbody>
