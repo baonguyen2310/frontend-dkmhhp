@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import './DataManagement.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
@@ -7,6 +7,7 @@ import Modal from '../Modal';
 import Button from '../Button';
 import Spinner from '../Spinner';
 import Table from '../Table';
+import FilterRow from '../FilterRow/FilterRow';
 import ConfirmationDialog from '../ConfirmationDialog';
 
 const DataManagement = ({
@@ -32,6 +33,18 @@ const DataManagement = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
+  const [filters, setFilters] = useState({});
+
+  // Filtered data
+  const filteredData = useMemo(() => {
+    return data.filter(item => {
+      return Object.entries(filters).every(([key, value]) => {
+        if (!value) return true;
+        const itemValue = item[key]?.toString().toLowerCase();
+        return itemValue?.includes(value.toLowerCase());
+      });
+    });
+  }, [data, filters]);
 
   const loadData = useCallback(async () => {
     setIsLoading(true);
@@ -129,6 +142,17 @@ const DataManagement = ({
     setNotification(null);
   };
 
+  const handleFilterChange = (key, value) => {
+    setFilters(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  };
+
+  const clearFilters = () => {
+    setFilters({});
+  };
+
   return (
     <div className="data-management-container">
       {isLoading && <Spinner />}
@@ -137,17 +161,22 @@ const DataManagement = ({
           <div className="list-header">
             <h3>{title} List</h3>
             {!disableAdd && (
-              <Button icon={faPlus} className="add-btn" onClick={() => {
-                console.log('Add button clicked in DataManagement'); // Thêm dòng này
-                openModal();
-              }}>
+              <Button icon={faPlus} className="add-btn" onClick={() => openModal()}>
                 Add {title}
               </Button>
             )}
           </div>
+          
+          <FilterRow
+            columns={columns}
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            onClearFilters={clearFilters}
+          />
+
           <Table
             columns={columns}
-            data={data}
+            data={filteredData}
             onEdit={disableEdit ? null : openModal}
             onDelete={disableDelete ? null : handleDeleteClick}
             idField={idField}

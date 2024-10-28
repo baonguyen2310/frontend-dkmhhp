@@ -91,13 +91,21 @@ const CourseRegistrationManagement = () => {
   };
 
   const columns = [
-    { key: 'registration_id', title: 'Registration ID' },
+    { key: 'registration_id', title: 'ID' },
     { 
       key: 'student_id', 
       title: 'Student', 
       render: (registration) => {
         const student = students.find(s => s.student_id === registration.student_id);
         return student ? `${student.first_name} ${student.last_name}` : registration.student_id;
+      }
+    },
+    { 
+      key: 'class_id', // Thêm cột class_id
+      title: 'Class', 
+      render: (registration) => {
+        const student = students.find(s => s.student_id === registration.student_id);
+        return student ? student.class_id : 'N/A';
       }
     },
     { 

@@ -1,11 +1,33 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import DataManagement from '../common/DataManagement/DataManagement';
-import { fetchFees } from '../../services/api';
+import { fetchFees, fetchStudents } from '../../services/api';
 
 const FeeManagement = () => {
+  const [students, setStudents] = useState([]);
+
+  useEffect(() => {
+    const loadStudents = async () => {
+      try {
+        const fetchedStudents = await fetchStudents();
+        setStudents(fetchedStudents);
+      } catch (error) {
+        console.error('Error fetching students:', error);
+      }
+    };
+    loadStudents();
+  }, []);
+
   const columns = [
     { key: 'fee_id', title: 'Fee ID' },
     { key: 'student_id', title: 'Student ID' },
+    { 
+      key: 'class_id', // Thêm cột class_id
+      title: 'Class', 
+      render: (fee) => {
+        const student = students.find(s => s.student_id === fee.student_id);
+        return student ? student.class_id : 'N/A';
+      }
+    },
     { key: 'semester_id', title: 'Semester ID' },
     { key: 'tuition_fee', title: 'Tuition Fee', render: (fee) => `$${fee.tuition_fee.toFixed(2)}` },
     { key: 'discount', title: 'Discount', render: (fee) => `$${fee.discount.toFixed(2)}` },
